@@ -3,20 +3,21 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const todoRoutes = express.Router();
+const allRoutes = express.Router();
+const PrettyUrl = require('./Utils/PrettyUrl');
 const PORT = 4000;
 let Todo = require('./todo.model');
 let Article = require('./article.model');
 app.use(cors());
 app.use(bodyParser.json());
-mongoose.connect('mongodb://127.0.0.1:27017/todos', { useNewUrlParser: true });
+mongoose.connect('mongodb://127.0.0.1:27017/articles', { useNewUrlParser: true });
 const connection = mongoose.connection;
 connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
 
 //Articles
-articleRoutes.route('/').get(function(req, res) {
+allRoutes.route('/').get(function(req, res) {
     Article.find(function(err, articles) {
         if (err) {
             console.log(err);
@@ -25,13 +26,34 @@ articleRoutes.route('/').get(function(req, res) {
         }
     });
 });
-articleRoutes.route('/:id').get(function(req, res) {
-    let id = req.params.id;
-    Todo.findById(id, function(err, article) {
-        res.json(article);
-    });
+allRoutes.route('/:slug').get(function(req, res) {
+    // Article.find({ title: req.params.title }, '_id', function (err, id) {
+    //   if (err) {
+    //       console.log(err);
+    //   } else {
+    //       res.json(id);
+    //
+    //   }
+    // })
+    //let slug = req.params.slug;
+    Article.findOne({where: { slug: req.params.slug }}), function (err, article) {
+      if (err) {
+          console.log(err);
+      } else {
+          res.json(article);
+      }
+    }
+    //let id = req.params.id;
+    // Article.findById(id, function(err, article) {
+    //   if (err) {
+    //       console.log(err);
+    //   } else {
+    //       res.json(article);
+    //   }
+    // });
+
 });
-articleRoutes.route('/add').post(function(req, res) {
+allRoutes.route('/add').post(function(req, res) {
     let article = new Article(req.body);
     article.save()
         .then(article => {
@@ -42,15 +64,17 @@ articleRoutes.route('/add').post(function(req, res) {
             });
         })
         .catch(err => {
-            res.status(400).send('adding new todo failed');
+            res.status(400).send('adding new Article failed');
+            console.log(article)
         });
 });
 
-app.use('/articles', articleRoutes);
+
+app.use('/articles', allRoutes);
 
 
 //TODOS
-todoRoutes.route('/').get(function(req, res) {
+allRoutes.route('/').get(function(req, res) {
     Todo.find(function(err, todos) {
         if (err) {
             console.log(err);
@@ -59,13 +83,13 @@ todoRoutes.route('/').get(function(req, res) {
         }
     });
 });
-todoRoutes.route('/:id').get(function(req, res) {
+allRoutes.route('/:id').get(function(req, res) {
     let id = req.params.id;
     Todo.findById(id, function(err, todo) {
         res.json(todo);
     });
 });
-todoRoutes.route('/update/:id').post(function(req, res) {
+allRoutes.route('/update/:id').post(function(req, res) {
     Todo.findById(req.params.id, function(err, todo) {
         if (!todo)
             res.status(404).send("data is not found");
@@ -82,7 +106,7 @@ todoRoutes.route('/update/:id').post(function(req, res) {
             });
     });
 });
-todoRoutes.route('/add').post(function(req, res) {
+allRoutes.route('/add').post(function(req, res) {
     let todo = new Todo(req.body);
     todo.save()
         .then(todo => {
@@ -96,7 +120,7 @@ todoRoutes.route('/add').post(function(req, res) {
             res.status(400).send('adding new todo failed');
         });
 });
-app.use('/todos', todoRoutes);
+app.use('/todos', allRoutes);
 app.listen(PORT, function() {
     console.log("Server is running on Port: " + PORT);
 });
