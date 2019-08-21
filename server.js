@@ -35,14 +35,16 @@ allRoutes.route('/:slug').get(function(req, res) {
     //
     //   }
     // })
-    //let slug = req.params.slug;
-    Article.findOne({where: { slug: req.params.slug }}), function (err, article) {
+    let slug = req.params.slug;
+    Article.findOne({ slug: slug }, function (err, article) {
+      console.log(slug)
       if (err) {
           console.log(err);
+
       } else {
           res.json(article);
       }
-    }
+    })
     //let id = req.params.id;
     // Article.findById(id, function(err, article) {
     //   if (err) {
