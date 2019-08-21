@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const todoRoutes = express.Router();
 const PORT = 4000;
 let Todo = require('./todo.model');
+let Article = require('./article.model');
 app.use(cors());
 app.use(bodyParser.json());
 mongoose.connect('mongodb://127.0.0.1:27017/todos', { useNewUrlParser: true });
@@ -13,6 +14,42 @@ const connection = mongoose.connection;
 connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
+
+//Articles
+articleRoutes.route('/').get(function(req, res) {
+    Article.find(function(err, articles) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json(articles);
+        }
+    });
+});
+articleRoutes.route('/:id').get(function(req, res) {
+    let id = req.params.id;
+    Todo.findById(id, function(err, article) {
+        res.json(article);
+    });
+});
+articleRoutes.route('/add').post(function(req, res) {
+    let article = new Article(req.body);
+    article.save()
+        .then(article => {
+            res.status(200).json(
+              {
+                'article': 'article added successfully',
+                'body': article
+            });
+        })
+        .catch(err => {
+            res.status(400).send('adding new todo failed');
+        });
+});
+
+app.use('/articles', articleRoutes);
+
+
+//TODOS
 todoRoutes.route('/').get(function(req, res) {
     Todo.find(function(err, todos) {
         if (err) {
