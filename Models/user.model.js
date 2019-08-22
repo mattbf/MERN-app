@@ -1,23 +1,6 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
-const roles = {
-    'user': { can: [] },
-    'admin': { can: ['read', 'write'] },
-}
-
-
-const operation = 'read';
-
-  // req.user is set post authentication
-  if (
-      !roles[req.user.role] ||
-      roles[req.user.role].can.indexOf(operation) === -1
-  ) {
-      // early return if the access control check fails
-      return res.status(404).end(); // or an "access denied" page
-  }
-
 var UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -38,6 +21,7 @@ var UserSchema = new mongoose.Schema({
   role: {
     type: String,
     default: 'user',
+    enum: ["user", "admin"]
   }
 });
 
@@ -74,6 +58,43 @@ UserSchema.pre('save', function (next) {
     next();
   })
 });
+
+UserSchema.statics.adminauth = function (email, password, callback) {
+  const operation = 'read';
+  User.findOne({ email: email })
+    .exec(function (err, user) {
+      if (err) {
+        return err
+      } else if (!user) {
+        var err = new Error('User not found.');
+        err.status = 401;
+        return err
+      }
+      bcrypt.compare(password, user.password, function (err, result) {
+        if (result === true) {
+          if (
+              !roles[user.role] ||
+              roles[user.role].can.indexOf(operation) === -1
+          ) {
+              // early return if the access control check fails
+              return res.status(404).send('Access Denied, not an Admin'); // or an "access denied" page NOT admin
+          } else {
+              User.find(function(err, users) {
+                if (err) {
+                  console.log(err)
+                } else {
+                  return res.json(users) //success
+                }
+              })
+          }
+        } else {
+          return err // password wrong
+        }
+      })
+    });
+    // req.user is set post authentication
+
+}
 
 
 var User = mongoose.model('User', UserSchema);
