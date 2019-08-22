@@ -24,6 +24,23 @@ router.post('/', function (req, res, next) {
 
     User.create(userData, function (error, user) {
       if (error) {
+        if (error.code === 11000) {
+          // email or username could violate the unique index. we need to find out which field it was.
+          let field = error.message.split(" ")[7];
+          field = field.split('_')[0]
+          console.log(error.message)
+          console.log(field)
+          // field = field.split(" dup key")[0];
+          // field = field.substring(0, field.lastIndexOf("_"));
+          // req.flash("errors", [{
+          //   msg: "An account with this " + field + " already exists."
+          // }]);
+          // res.redirect("/join");
+          return res.json({
+            'error': 'This user already exists',
+            'value': field
+          });
+        }
         return next(error);
       } else {
         req.session.userId = user._id;
@@ -82,3 +99,16 @@ router.get('/logout', function (req, res, next) {
 });
 
 module.exports = router;
+
+
+// if (error.code === 11000) {
+//   // email or username could violate the unique index. we need to find out which field it was.
+//   var field = error.message.split(".$")[1];
+//   field = field.split(" dup key")[0];
+//   field = field.substring(0, field.lastIndexOf("_"));
+//   req.flash("errors", [{
+//     msg: "An account with this " + field + " already exists."
+//   }]);
+//   res.redirect("/join");
+//   return;
+// }
