@@ -8,6 +8,11 @@ var User = require('../Models/user.model');
 //   return res.sendFile(path.join(__dirname + '/templateLogReg/index.html'));
 // });
 
+const roles = {
+    'normal': { can: [] },
+    'admin': { can: ['read'] },
+    'superadmin': { can: ['read', 'write'] },
+}
 
 //POST route for updating data
 router.post('/', function (req, res, next) {
@@ -107,6 +112,16 @@ router.get('/logout', function (req, res, next) {
 
 // GET admin page
 router.get('/admin', function (req, res, next) {
+  const operation = 'read';
+
+    // req.user is set post authentication
+    if (
+        !roles[req.user.role] ||
+        roles[req.user.role].can.indexOf(operation) === -1
+    ) {
+        // early return if the access control check fails
+        return res.status(404).end(); // or an "access denied" page
+    }
   User.find(function(err, users) {
     if (err) {
       console.log(err)
@@ -118,16 +133,3 @@ router.get('/admin', function (req, res, next) {
 
 
 module.exports = router;
-
-
-// if (error.code === 11000) {
-//   // email or username could violate the unique index. we need to find out which field it was.
-//   var field = error.message.split(".$")[1];
-//   field = field.split(" dup key")[0];
-//   field = field.substring(0, field.lastIndexOf("_"));
-//   req.flash("errors", [{
-//     msg: "An account with this " + field + " already exists."
-//   }]);
-//   res.redirect("/join");
-//   return;
-// }
