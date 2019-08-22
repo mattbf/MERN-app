@@ -18,12 +18,10 @@ router.route('/:slug').get(function(req, res) {
   User.findById(req.session.userId)
     .exec(function (error, user) {
       if (error) {
-        return next(error);
+        return res.status(400).send("Not logged in");
       } else {
         if (user === null) {
-          var err = new Error('Not authorized! Go back!');
-          err.status = 400;
-          return next(err);
+          return res.status(401).send("Not authorized!");
         } else {
           let slug = req.params.slug;
           Article.findOne({ slug: slug }, function (err, article) {
