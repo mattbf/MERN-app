@@ -26,8 +26,15 @@ router.post('/', function (req, res, next) {
       if (error) {
         if (error.code === 11000) {
           // email or username could violate the unique index. we need to find out which field it was.
+          let message = "duplicate error"
           let field = error.message.split(" ")[7];
           field = field.split('_')[0]
+          if (field == 'email') {
+            message = "This user already exists"
+          } else {
+            message = "username is taken"
+          }
+
           console.log(error.message)
           console.log(field)
           // field = field.split(" dup key")[0];
@@ -37,7 +44,7 @@ router.post('/', function (req, res, next) {
           // }]);
           // res.redirect("/join");
           return res.json({
-            'error': 'This user already exists',
+            'message': message,
             'value': field
           });
         }
