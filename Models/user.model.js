@@ -2,10 +2,11 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
 const roles = {
-    'normal': { can: [] },
-    'admin': { can: ['read'] },
-    'superadmin': { can: ['read', 'write'] },
+    'user': { can: [] },
+    'admin': { can: ['read', 'write'] },
 }
+
+
 const operation = 'read';
 
   // req.user is set post authentication
@@ -33,6 +34,10 @@ var UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+  role: {
+    type: String,
+    default: 'user',
   }
 });
 
