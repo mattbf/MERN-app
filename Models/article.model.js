@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const PrettyUrl = require('./Utils/PrettyUrl');
+//const PrettyUrl = require('./Utils/PrettyUrl');
 
 let Article = new Schema({
     title: {
