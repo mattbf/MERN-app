@@ -1,6 +1,7 @@
 var express  = require('express');
 var router = express.Router();
 let Article = require('../Models/article.model');
+var User = require('../Models/user.model');
 
 //Get All Articles
 router.route('/').get(function(req, res) {
@@ -14,33 +15,28 @@ router.route('/').get(function(req, res) {
 });
 //Get one Article
 router.route('/:slug').get(function(req, res) {
-    // Article.find({ title: req.params.title }, '_id', function (err, id) {
-    //   if (err) {
-    //       console.log(err);
-    //   } else {
-    //       res.json(id);
-    //
-    //   }
-    // })
-    let slug = req.params.slug;
-    Article.findOne({ slug: slug }, function (err, article) {
-      console.log(slug)
-      if (err) {
-          console.log(err);
-
+  User.findById(req.session.userId)
+    .exec(function (error, user) {
+      if (error) {
+        return next(error);
       } else {
-          res.json(article);
+        if (user === null) {
+          var err = new Error('Not authorized! Go back!');
+          err.status = 400;
+          return next(err);
+        } else {
+          let slug = req.params.slug;
+          Article.findOne({ slug: slug }, function (err, article) {
+            console.log(slug)
+            if (err) {
+                console.log(err + 'Could not find article');
+            } else {
+                res.json(article);
+            }
+          })
+        }
       }
-    })
-    //let id = req.params.id;
-    // Article.findById(id, function(err, article) {
-    //   if (err) {
-    //       console.log(err);
-    //   } else {
-    //       res.json(article);
-    //   }
-    // });
-
+    });
 });
 //Post an Article
 router.route('/add').post(function(req, res) {
