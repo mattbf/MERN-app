@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var User = require('../models/user');
+var User = require('../Models/user.model');
 
 
 // // Don't need to display
@@ -14,7 +14,7 @@ router.post('/', function (req, res, next) {
 
   if (req.body.email &&
     req.body.username &&
-    req.body.password &&) {
+    req.body.password) {
 
     var userData = {
       email: req.body.email,
@@ -39,7 +39,7 @@ router.post('/', function (req, res, next) {
         return next(err);
       } else {
         req.session.userId = user._id;
-        return res.redirect('/profile');
+        return res.status(200).send('user logged in with sessions successfully');
       }
     });
   } else {
@@ -49,7 +49,7 @@ router.post('/', function (req, res, next) {
   }
 })
 
-// GET route after registering
+// GET profile after registering
 router.get('/profile', function (req, res, next) {
   User.findById(req.session.userId)
     .exec(function (error, user) {
@@ -75,7 +75,7 @@ router.get('/logout', function (req, res, next) {
       if (err) {
         return next(err);
       } else {
-        return res.redirect('/');
+        return res.status(200).send('user logged out');
       }
     });
   }
