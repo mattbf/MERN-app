@@ -22,6 +22,10 @@ var UserSchema = new mongoose.Schema({
     type: String,
     default: 'user',
     enum: ["user", "admin"]
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

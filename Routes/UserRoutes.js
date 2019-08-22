@@ -78,8 +78,8 @@ router.post('/', function (req, res, next) {
   }
 })
 
-// GET profile after registering
-router.get('/profile', function (req, res, next) {
+// Get something with sessions
+router.get('/auth', function (req, res, next) {
   User.findById(req.session.userId)
     .exec(function (error, user) {
       if (error) {
@@ -90,7 +90,9 @@ router.get('/profile', function (req, res, next) {
           err.status = 400;
           return next(err);
         } else {
-          return res.json(user.username);
+          return res.json({
+            "username": user.username,
+          });
         }
       }
     });
