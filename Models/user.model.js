@@ -1,6 +1,22 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
+const roles = {
+    'normal': { can: [] },
+    'admin': { can: ['read'] },
+    'superadmin': { can: ['read', 'write'] },
+}
+const operation = 'read';
+
+  // req.user is set post authentication
+  if (
+      !roles[req.user.role] ||
+      roles[req.user.role].can.indexOf(operation) === -1
+  ) {
+      // early return if the access control check fails
+      return res.status(404).end(); // or an "access denied" page
+  }
+
 var UserSchema = new mongoose.Schema({
   email: {
     type: String,
