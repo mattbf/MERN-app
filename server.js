@@ -70,9 +70,29 @@ allRoutes.route('/add').post(function(req, res) {
             console.log(article)
         });
 });
-
+//Add comments to article
+allRoutes.route('/:slug/comments').post(function(req, res) {
+    let slug = req.params.slug;
+    Article.findOne({ slug: slug }, function (err, article) {
+        if (!article)
+            res.status(404).send("Article not found");
+        else
+            todo.todo_description = req.body.todo_description;
+            todo.todo_responsible = req.body.todo_responsible;
+            todo.todo_priority = req.body.todo_priority;
+            todo.todo_completed = req.body.todo_completed;
+            todo.save().then(todo => {
+                res.json('Todo updated!');
+            })
+            .catch(err => {
+                res.status(400).send("Update not possible");
+            });
+    });
+});
 
 app.use('/articles', allRoutes);
+
+
 
 
 //TODOS
