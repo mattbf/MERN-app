@@ -19,7 +19,7 @@ let Article = new Schema({
         type: Date, default: Date.now ,
     },
     comments: [
-      { body: String, date: Date, author: String }
+      { body: String, date: { type: Date, default: Date.now }, author: String }
     ],
     meta: {
       votes: Number,

@@ -73,16 +73,14 @@ allRoutes.route('/add').post(function(req, res) {
 //Add comments to article
 allRoutes.route('/:slug/comments').post(function(req, res) {
     let slug = req.params.slug;
+    console.log(slug)
     Article.findOne({ slug: slug }, function (err, article) {
         if (!article)
             res.status(404).send("Article not found");
         else
-            todo.todo_description = req.body.todo_description;
-            todo.todo_responsible = req.body.todo_responsible;
-            todo.todo_priority = req.body.todo_priority;
-            todo.todo_completed = req.body.todo_completed;
-            todo.save().then(todo => {
-                res.json('Todo updated!');
+            article.comments.push(req.body)
+            article.save().then(article => {
+                res.json('Comments added to ' + article.title);
             })
             .catch(err => {
                 res.status(400).send("Update not possible");
