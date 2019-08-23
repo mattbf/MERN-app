@@ -40,14 +40,6 @@ router.post('/', function (req, res, next) {
             message = "username is taken"
           }
 
-          console.log(error.message)
-          console.log(field)
-          // field = field.split(" dup key")[0];
-          // field = field.substring(0, field.lastIndexOf("_"));
-          // req.flash("errors", [{
-          //   msg: "An account with this " + field + " already exists."
-          // }]);
-          // res.redirect("/join");
           return res.json({
             'message': message,
             'value': field
@@ -78,9 +70,10 @@ router.post('/', function (req, res, next) {
   }
 })
 
-// Get something with sessions
+// Get username with sessions
 router.get('/auth', function (req, res, next) {
   User.findById(req.session.userId)
+    //console.log(req.session.userId)
     .exec(function (error, user) {
       if (error) {
         return next(error);
@@ -91,6 +84,7 @@ router.get('/auth', function (req, res, next) {
           return next(err);
         } else {
           return res.json({
+            "auth": true,
             "username": user.username,
           });
         }
