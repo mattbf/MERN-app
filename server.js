@@ -3,9 +3,13 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-import { PORT, NODE_ENV, SESS_NAME, SESS_SECRET, SESS_LIFETIME } from './config';
-//const PORT = 4000;
-
+//import { PORT, NODE_ENV, SESS_NAME, SESS_SECRET, SESS_LIFETIME } from './config'  //require('./config');
+//const serverConfig = require('./config')
+const dotenv = require('dotenv');
+require('dotenv').config();
+//var PORT = serverConfig.PORT
+const PORT = process.env.PORT;
+console.log(PORT)
 var articleRouter = require('./Routes/ArticleRoutes');
 var userRouter = require('./Routes/UserRoutes')
 
@@ -31,31 +35,31 @@ db.once('open', function() {
 })
 
 //use sessions for tracking logins
-// app.use(session({
-//   secret: 'work hard',
-//   resave: true,
-//   saveUninitialized: false,
-//   store: new MongoStore({
-//     mongooseConnection: db
-//   })
-// }));
-
 app.use(session({
-      name: SESS_NAME,
-      secret: SESS_SECRET,
-      saveUninitialized: false,
-      resave: false,
-      store: new MongoStore({
-        mongooseConnection: db,
-        collection: 'session',
-        ttl: parseInt(SESS_LIFETIME) / 1000
-      }),
-      cookie: {
-        sameSite: true,
-        secure: NODE_ENV === 'production',
-        maxAge: parseInt(SESS_LIFETIME)
-      }
-    }));
+  secret: 'work hard',
+  resave: true,
+  saveUninitialized: false,
+  store: new MongoStore({
+    mongooseConnection: db
+  })
+}));
+
+// app.use(session({
+//       name: SESS_NAME,
+//       secret: SESS_SECRET,
+//       saveUninitialized: false,
+//       resave: false,
+//       store: new MongoStore({
+//         mongooseConnection: db,
+//         collection: 'session',
+//         ttl: parseInt(SESS_LIFETIME) / 1000
+//       }),
+//       cookie: {
+//         sameSite: true,
+//         secure: NODE_ENV === 'production',
+//         maxAge: parseInt(SESS_LIFETIME)
+//       }
+//     }));
 
 app.use('/articles', articleRouter);
 app.use('/user', userRouter);

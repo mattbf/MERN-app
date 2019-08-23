@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../Models/user.model');
-import { SESS_NAME } from "../config";
+const SESS_NAME  = require("../config");
 
 // // Don't need to display
 // router.get('/', function (req, res, next) {
@@ -47,7 +47,7 @@ router.post('/', function (req, res, next) {
         }
         return next(error);
       } else {
-        const sessionUser = sessionizeUser(newUser);
+
         req.session.userId = user._id;
         return res.status(200).send('user ' + user.username + ' created successfully');
       }
@@ -62,7 +62,7 @@ router.post('/', function (req, res, next) {
       } else {
         req.session.userId = user._id;
         res.clearCookie(SESS_NAME);
-        return res.status(200).send(user.username' logged in successfully'); // pass logemail to log back in
+        return res.status(200).send(user.username + ' logged in successfully'); // pass logemail to log back in
       }
     });
   } else {
@@ -72,7 +72,7 @@ router.post('/', function (req, res, next) {
   }
 })
 
-// Get username with sessions
+//Check if logged in
 router.get('/auth', function (req, res, next) {
   User.findById(req.session.userId)
     //console.log(req.session.userId)
@@ -93,6 +93,9 @@ router.get('/auth', function (req, res, next) {
       }
     });
 });
+// router.get('/auth', ({ session: { user }}, res) => {
+//   res.send({ user }); //will either be user obj or undefined
+// });
 
 // GET for logout logout
 router.get('/logout', function (req, res, next) {
