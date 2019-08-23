@@ -61,7 +61,7 @@ router.post('/', function (req, res, next) {
         return next(err);
       } else {
         req.session.userId = user._id;
-        res.clearCookie(SESS_NAME);
+        console.log(user.username + " logged in Session: " + req.session.userId)
         return res.status(200).send(user.username + ' logged in successfully'); // pass logemail to log back in
       }
     });
@@ -74,8 +74,8 @@ router.post('/', function (req, res, next) {
 
 //Check if logged in
 router.get('/auth', function (req, res, next) {
+  console.log(req.session)
   User.findById(req.session.userId)
-    //console.log(req.session.userId)
     .exec(function (error, user) {
       if (error) {
         return next(error);
@@ -85,10 +85,7 @@ router.get('/auth', function (req, res, next) {
           err.status = 400;
           return next(err);
         } else {
-          return res.json({
-            "auth": true,
-            "username": user.username,
-          });
+          return res.json(user);
         }
       }
     });
@@ -105,7 +102,8 @@ router.get('/logout', function (req, res, next) {
       if (err) {
         return next(err);
       } else {
-        return res.status(200).send('user logged out');
+        res.clearCookie(SESS_NAME);
+        return res.status(200).send(req.session + ' logged out');
       }
     });
   }

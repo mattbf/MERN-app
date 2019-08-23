@@ -32,7 +32,8 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
-//app.use(cors({credentials: true, origin: 'http://localhost:3000', domain: ".app.localhost"}));
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+
 mongoose.connect('mongodb://127.0.0.1:27017/articles', { useNewUrlParser: true });
 var db = mongoose.connection;
 db.once('open', function() {
