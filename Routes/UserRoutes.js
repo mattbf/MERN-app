@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../Models/user.model');
-import { parseError, sessionizeUser } from "../util/helpers";
+import { SESS_NAME } from "../config";
 
 // // Don't need to display
 // router.get('/', function (req, res, next) {
@@ -48,10 +48,8 @@ router.post('/', function (req, res, next) {
         return next(error);
       } else {
         const sessionUser = sessionizeUser(newUser);
-        req.session.user = sessionUser;
-        //res.send(sessionUser);
-        //req.session.userId = user._id;
-        return res.status(200).send('user ' + sessionUser + ' created successfully');
+        req.session.userId = user._id;
+        return res.status(200).send('user ' + user.username + ' created successfully');
       }
     });
 
@@ -63,7 +61,8 @@ router.post('/', function (req, res, next) {
         return next(err);
       } else {
         req.session.userId = user._id;
-        return res.status(200).send('user logged in successfully'); // pass logemail to log back in
+        res.clearCookie(SESS_NAME);
+        return res.status(200).send(user.username' logged in successfully'); // pass logemail to log back in
       }
     });
   } else {
