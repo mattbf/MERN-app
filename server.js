@@ -13,7 +13,7 @@ const SESS_LIFETIME = process.env.SESS_LIFETIME
 const NODE_ENV=process.env.NODE_ENV
 const SESS_NAME=process.env.SESS_NAME
 const SESS_SECRET=process.env.SESS_SECRET
-
+console.log(NODE_ENV === 'production')
 
 var articleRouter = require('./Routes/ArticleRoutes');
 var userRouter = require('./Routes/UserRoutes')
@@ -22,7 +22,7 @@ var userRouter = require('./Routes/UserRoutes')
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 
-app.use(cors());
+//app.use(cors());
 app.use(bodyParser.json());
 //express.session({cookie: { domain: '.app.localhost', maxAge: 24 * 60 * 60 * 1000 }})
 
@@ -32,7 +32,12 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+const corsConfig = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+app.use(cors(corsConfig));
+//app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 mongoose.connect('mongodb://127.0.0.1:27017/articles', { useNewUrlParser: true });
 var db = mongoose.connection;
@@ -63,7 +68,7 @@ app.use(session({
       cookie: {
         sameSite: true,
         secure: NODE_ENV === 'production',
-        maxAge: parseInt(SESS_LIFETIME)
+        maxAge: parseInt(SESS_LIFETIME),
       }
     }));
 
