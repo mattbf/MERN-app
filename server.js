@@ -3,7 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-import { PORT, NODE_ENV } from './config';
+import { PORT, NODE_ENV, SESS_NAME, SESS_SECRET, SESS_LIFETIME } from './config';
 //const PORT = 4000;
 
 var articleRouter = require('./Routes/ArticleRoutes');
@@ -31,14 +31,14 @@ db.once('open', function() {
 })
 
 //use sessions for tracking logins
-app.use(session({
-  secret: 'work hard',
-  resave: true,
-  saveUninitialized: false,
-  store: new MongoStore({
-    mongooseConnection: db
-  })
-}));
+// app.use(session({
+//   secret: 'work hard',
+//   resave: true,
+//   saveUninitialized: false,
+//   store: new MongoStore({
+//     mongooseConnection: db
+//   })
+// }));
 
 app.use(session({
       name: SESS_NAME,
