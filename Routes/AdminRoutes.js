@@ -30,6 +30,8 @@ router.get('/', function (req, res, next) {
           // early return if the access control check fails
           return res.status(404).send('Access Denied, not an Admin'); // or an "access denied" page NOT admin
       } else {
+        let allArticles = []
+        //let user = []
           User.find(function(err, users) {
             if (err) {
               console.log(err) //error getting user list
@@ -38,14 +40,13 @@ router.get('/', function (req, res, next) {
                   if (err) {
                       console.log(err);
                   } else {
-                      let allArticles = articles
-                      //res.json(articles);
+                    return res.json({
+                      articles: articles,
+                      users: users
+                    }) //success
                   }
               });
-              return res.json({
-                articles: allArticles,
-                users: users
-              }) //success
+              console.log("success")
             }
           })
       }
