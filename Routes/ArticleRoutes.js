@@ -29,6 +29,8 @@ router.route('/:slug').get(function(req, res) {
             if (err) {
                 console.log(err + 'Could not find article');
             } else {
+                console.log("heres your article")
+                console.log(article)
                 res.json(article);
             }
           })

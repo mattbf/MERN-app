@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../Models/user.model');
-const SESS_NAME  = require("../config");
+const SESS_NAME=process.env.SESS_NAME
 
 // // Don't need to display
 // router.get('/', function (req, res, next) {

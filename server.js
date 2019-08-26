@@ -17,6 +17,7 @@ console.log(NODE_ENV === 'production')
 
 var articleRouter = require('./Routes/ArticleRoutes');
 var userRouter = require('./Routes/UserRoutes')
+var adminRouter = require('./Routes/AdminRoutes')
 
 //user session pakckages
 var session = require('express-session');
@@ -75,6 +76,7 @@ app.use(session({
 
 app.use('/articles', articleRouter);
 app.use('/user', userRouter);
+app.use('/admin', adminRouter);
 
 
 
