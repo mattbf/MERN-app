@@ -14,9 +14,11 @@ const roles = {
 // GET admin page
 router.get('/', function (req, res, next) {
   //User.adminauth(req.body.email, req.body.password)
-  User.authenticate(req.body.email, req.body.password, function (error, user) {
+  //User.authenticate(req.body.email, req.body.password, function (error, user) {
+  User.findById(req.session.userId, function (error, user) {
+
     if (error || !user) {
-      var err = new Error('Wrong email or password.');
+      var err = new Error('No user');
       err.status = 401;
       return next(err);
     } else {
@@ -30,8 +32,6 @@ router.get('/', function (req, res, next) {
           // early return if the access control check fails
           return res.status(404).send('Access Denied, not an Admin'); // or an "access denied" page NOT admin
       } else {
-        let allArticles = []
-        //let user = []
           User.find(function(err, users) {
             if (err) {
               console.log(err) //error getting user list
