@@ -33,7 +33,8 @@ app.use(function(req, res, next) {
   next();
 });
 const corsConfig = {
-    origin: 'http://localhost:3000',
+    origin:['http://localhost:3000'],
+    methods:['GET','POST'],
     credentials: true,
 };
 app.use(cors(corsConfig));
