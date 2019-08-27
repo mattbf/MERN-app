@@ -62,11 +62,11 @@ router.route('/delete/:slug').post(function(req, res) {
           return res.status(404).send(user.username + " is a " + user.role + '. Access Denied, not an Admin'); // or an "access denied" page NOT admin
       } else {
         Article.deleteOne({ slug: slug }, function (err, article) {
-          console.log(slug)
+          //console.log(slug)
           if (err) {
               console.log(err + 'Could not delete article');
           } else {
-              console.log(article.tile + " deleted")
+              console.log(article.title + " deleted")
               res.status(200).send(slug + ' deleted');
           }
         })

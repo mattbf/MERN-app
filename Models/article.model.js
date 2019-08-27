@@ -12,7 +12,7 @@ let Article = new Schema({
         required: true,
     },
     body: {
-        type: String,
+        type: Object,
         required: true,
     },
     createdAt: {
