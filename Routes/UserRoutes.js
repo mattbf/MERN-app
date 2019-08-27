@@ -49,7 +49,12 @@ router.post('/', function (req, res, next) {
       } else {
 
         req.session.userId = user._id;
-        return res.status(200).send('user ' + user.username + ' created successfully');
+        return res.status(200).json({
+          'username': user.username,
+          'email': user.email,
+          'role': user.role,
+          'createdAt': user.createdAt,
+        });
       }
     });
 
@@ -85,7 +90,12 @@ router.get('/auth', function (req, res, next) {
           err.status = 400;
           return next(err);
         } else {
-          return res.json(user);
+          return res.json({
+            'username': user.username,
+            'email': user.email,
+            'role': user.role,
+            'createdAt': user.createdAt,
+          });
         }
       }
     });
