@@ -122,17 +122,22 @@ router.post('/:username/update', function(req, res) {
   let username = req.params.username;
   console.log(req.body)
   console.log(req.params.username)
-  User.findOne({ username: username }, function (err, user){
-    if (err) {
-      res.status(404).send("User not found");
-    } else {
-      console.log(user.bio)
-      user.bio = req.body.bio;
-      user.save().then(user => {
-          res.json('User bio Update' + user);
-      })
-    }
-  });
+  if (req.body.bio) {
+    User.findOne({ username: username }, function (err, user){
+      if (err) {
+        res.status(404).send("User not found");
+      } else {
+        console.log(user.bio)
+        user.bio = req.body.bio;
+        user.save().then(user => {
+            res.json('User bio Update' + user);
+        })
+      }
+    });
+  } else {
+    res.status(400).send("Need valid bio object"); 
+  }
+
 })
 
 router.get('/:username', function (req, res, next) {
