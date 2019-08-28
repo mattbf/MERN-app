@@ -45,7 +45,7 @@ router.route('/:slug').get(function(req, res) {
       }
     });
 });
-//delte and article
+//delte and article by slug
 router.route('/delete/:slug').post(function(req, res) {
   let slug = req.params.slug;
   User.findById(req.session.userId, function (error, user) {
@@ -69,6 +69,36 @@ router.route('/delete/:slug').post(function(req, res) {
           } else {
               console.log(article.title + " deleted")
               res.status(200).send(slug + ' deleted');
+          }
+        })
+      }
+    }
+  });
+});
+//delte and article by id
+router.route('/delete/id/:id').post(function(req, res) {
+  let id = req.params.id;
+  User.findById(req.session.userId, function (error, user) {
+    if (error || !user) {
+      res.status(400).send('Not logged in');
+    } else {
+      req.session.userId = user._id;
+      const operation = 'read';
+      console.log(user.role)
+      if (
+          !roles[user.role] ||
+          roles[user.role].can.indexOf(operation) === -1
+      ) {
+          // early return if the access control check fails
+          return res.status(404).send(user.username + " is a " + user.role + '. Access Denied, not an Admin'); // or an "access denied" page NOT admin
+      } else {
+        Article.deleteOne({ _id: id }, function (err, article) {
+          //console.log(slug)
+          if (err) {
+              console.log(err + 'Could not delete article');
+          } else {
+              console.log(article.title + " deleted")
+              res.status(200).send(id + ' deleted');
           }
         })
       }

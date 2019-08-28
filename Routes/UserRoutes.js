@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../Models/user.model');
+let Article = require('../Models/article.model');
 const SESS_NAME=process.env.SESS_NAME
 
 // // Don't need to display
@@ -119,37 +120,93 @@ router.get('/logout', function (req, res, next) {
   }
 });
 
-// GET admin page
-// router.get('/admin', function (req, res, next) {
-//   //User.adminauth(req.body.email, req.body.password)
-//   User.authenticate(req.body.email, req.body.password, function (error, user) {
-//     if (error || !user) {
-//       var err = new Error('Wrong email or password.');
-//       err.status = 401;
-//       return next(err);
-//     } else {
-//       req.session.userId = user._id;
-//       const operation = 'read';
-//       console.log(user.role)
-//       if (
-//           !roles[user.role] ||
-//           roles[user.role].can.indexOf(operation) === -1
-//       ) {
-//           // early return if the access control check fails
-//           return res.status(404).send('Access Denied, not an Admin'); // or an "access denied" page NOT admin
-//       } else {
-//           User.find(function(err, users) {
-//             if (err) {
-//               console.log(err) //error getting user list
-//             } else {
-//               return res.json(users) //success
-//             }
-//           })
-//       }
-//     }
-//   });
-//
-// });
+//GET profile page
+router.get('/test/:username', function (req, res, next) {
+  //console.log(req.session)
+  let profile = req.params.username;
+  User.findById(req.session.userId)
+    .exec(function (error, user) {
+      if (error) {
+        return next(error);
+      } else {
+        if (user === null) {
+          var err = new Error('Not authorized! Go back!');
+          err.status = 400;
+          return next(err);
+        } else {
+          //get all the articles
+          Article.find(function(err, articles) {
+              if (err) {
+                  console.log(err);
+              } else {
+                  articles.find({ author: profile }, function (err, authorArticles) {
+                    if (err) {
+                        console.log(err + 'Error finding articles');
+                        res.status(400).send("Error finding articles")
+                    } else {
+                      //found articles for user
+                      articles.comments.find().count({ author: profile }, function (err, authorComments) {
+                        if (err) {
+                            console.log(err + 'Error finding Comments');
+                            res.status(400).send("Error finding Comments")
+                        } else {
+                          //found comments for user
+                          console.log("success, found profile info")
+                          return res.json({
+                            user: {
+                              username: user.username,
+                              role: user.role,
+                              email: user.email,
+                              createdAt: user.createdAt,
+                              bio: user.bio
+                            },
+                            articles: authorArticles,
+                            commentsCount: authorComments,
+                          })
+                        }
+                      })
+                    }
+              })
+          }
+
+          })
+        }
+      }
+    })
+});
+
+router.get('/:username', function (req, res, next) {
+  //console.log(req.session)
+  let profile = req.params.username;
+  User.findById(req.session.userId)
+    .exec(function (error, user) {
+      if (error) {
+        return next(error);
+      } else {
+        if (user === null) {
+          var err = new Error('Not authorized! Go back!');
+          err.status = 400;
+          return next(err);
+        } else {
+          User.find({username: profile}, function(err, userProfile) {
+            console.log(userProfile)
+            Article.find(function(err, articles) {
+                if (err) {
+                    console.log(err);
+                } else {
+                  return res.json({'articles': articles})
+                  // articles.comments.find({ author: profile }, function (err, authorComments) {
+                  //   if (err) {
+                  //       console.log(err + 'Error finding articles');
+                  //       res.status(400).send("Error finding articles")
+                  //   } else {
+                  //     return res.json({'comments': authorComments})
+                  //   }})
+                }
+          })
+        })
+    }}})
+});
 
 
 module.exports = router;

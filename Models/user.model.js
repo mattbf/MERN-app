@@ -26,6 +26,10 @@ var UserSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  bio: {
+    type: String,
+    default: 'This is your user bio. Tell us about yourself, the most intriguing thing about you, and your topics of interest',
   }
 });
 
