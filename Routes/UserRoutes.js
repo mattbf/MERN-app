@@ -41,7 +41,7 @@ router.post('/', function (req, res, next) {
             message = "username is taken"
           }
 
-          return res.json({
+          return res.status(400).send({
             'message': message,
             'value': field
           });
@@ -135,7 +135,7 @@ router.post('/:username/update', function(req, res) {
       }
     });
   } else {
-    res.status(400).send("Need valid bio object"); 
+    res.status(400).send("Need valid bio object");
   }
 
 })
@@ -187,6 +187,15 @@ router.get('/:username', function (req, res, next) {
     }}})
 });
 //User.find({name:'vlad','links.url':req.params.query}
+
+// DANGER DELET ALL UserS
+router.post('/deleteall', function(req, res) {
+  User.deleteMany({}, function (err) {
+    if(err) console.log(err);
+    console.log("Successful deletion");
+  });
+})
+
 
 
 module.exports = router;
