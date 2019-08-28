@@ -190,23 +190,32 @@ router.get('/:username', function (req, res, next) {
         } else {
           User.find({username: profile}, function(err, userProfile) {
             console.log(userProfile)
-            Article.find(function(err, articles) {
+            Article.find({author: profile}, function(err, authorArticles) {
                 if (err) {
                     console.log(err);
                 } else {
-                  return res.json({'articles': articles})
-                  // articles.comments.find({ author: profile }, function (err, authorComments) {
-                  //   if (err) {
-                  //       console.log(err + 'Error finding articles');
-                  //       res.status(400).send("Error finding articles")
-                  //   } else {
-                  //     return res.json({'comments': authorComments})
-                  //   }})
+                  // return res.json({
+                  //   'articles': authorArticles
+                  // })
+                  Article.find().count({author: profile, 'comments.author': profile}, function(err, comments) {
+                      if (err) {
+                          console.log(err);
+                      } else {
+                        return res.json({
+                          'profile': userProfile,
+                          'articles': authorArticles,
+                          'comments': comments
+                        })
+                      }
+                  })
                 }
-          })
+            })
+
+
         })
     }}})
 });
+//User.find({name:'vlad','links.url':req.params.query}
 
 
 module.exports = router;
