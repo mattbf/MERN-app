@@ -101,9 +101,6 @@ router.get('/auth', function (req, res, next) {
       }
     });
 });
-// router.get('/auth', ({ session: { user }}, res) => {
-//   res.send({ user }); //will either be user obj or undefined
-// });
 
 // GET for logout logout
 router.get('/logout', function (req, res, next) {
@@ -120,60 +117,23 @@ router.get('/logout', function (req, res, next) {
   }
 });
 
-//GET profile page
-router.get('/test/:username', function (req, res, next) {
-  //console.log(req.session)
-  let profile = req.params.username;
-  User.findById(req.session.userId)
-    .exec(function (error, user) {
-      if (error) {
-        return next(error);
-      } else {
-        if (user === null) {
-          var err = new Error('Not authorized! Go back!');
-          err.status = 400;
-          return next(err);
-        } else {
-          //get all the articles
-          Article.find(function(err, articles) {
-              if (err) {
-                  console.log(err);
-              } else {
-                  articles.find({ author: profile }, function (err, authorArticles) {
-                    if (err) {
-                        console.log(err + 'Error finding articles');
-                        res.status(400).send("Error finding articles")
-                    } else {
-                      //found articles for user
-                      articles.comments.find().count({ author: profile }, function (err, authorComments) {
-                        if (err) {
-                            console.log(err + 'Error finding Comments');
-                            res.status(400).send("Error finding Comments")
-                        } else {
-                          //found comments for user
-                          console.log("success, found profile info")
-                          return res.json({
-                            user: {
-                              username: user.username,
-                              role: user.role,
-                              email: user.email,
-                              createdAt: user.createdAt,
-                              bio: user.bio
-                            },
-                            articles: authorArticles,
-                            commentsCount: authorComments,
-                          })
-                        }
-                      })
-                    }
-              })
-          }
-
-          })
-        }
-      }
-    })
-});
+//Updateing User bio
+router.post('/:username/update', function(req, res) {
+  let username = req.params.username;
+  console.log(req.body)
+  console.log(req.params.username)
+  User.findOne({ username: username }, function (err, user){
+    if (err) {
+      res.status(404).send("User not found");
+    } else {
+      console.log(user.bio)
+      user.bio = req.body.bio;
+      user.save().then(user => {
+          res.json('User bio Update' + user);
+      })
+    }
+  });
+})
 
 router.get('/:username', function (req, res, next) {
   //console.log(req.session)
@@ -202,7 +162,13 @@ router.get('/:username', function (req, res, next) {
                           console.log(err);
                       } else {
                         return res.json({
-                          'profile': userProfile,
+                          'profile': {
+                            'username': userProfile[0].username,
+                            'role': userProfile[0].role,
+                            'email': userProfile[0].email,
+                            'createdAt': userProfile[0].createdAt,
+                            'bio': userProfile[0].bio
+                          },
                           'articles': authorArticles,
                           'comments': comments
                         })
