@@ -140,6 +140,7 @@ router.post('/:username/update', function(req, res) {
 
 })
 
+//GET user profile
 router.get('/:username', function (req, res, next) {
   //console.log(req.session)
   let profile = req.params.username;
@@ -158,27 +159,37 @@ router.get('/:username', function (req, res, next) {
             Article.find({author: profile}, function(err, authorArticles) {
                 if (err) {
                     console.log(err);
+                    var err = new Error("User has no articles");
+                    err.status = 400;
+                    return next(err);
                 } else {
                   // return res.json({
                   //   'articles': authorArticles
                   // })
-                  Article.find().count({author: profile, 'comments.author': profile}, function(err, comments) {
-                      if (err) {
-                          console.log(err);
-                      } else {
-                        return res.json({
-                          'profile': {
-                            'username': userProfile[0].username,
-                            'role': userProfile[0].role,
-                            'email': userProfile[0].email,
-                            'createdAt': userProfile[0].createdAt,
-                            'bio': userProfile[0].bio
-                          },
-                          'articles': authorArticles,
-                          'comments': comments
-                        })
-                      }
-                  })
+                  if (userProfile[0]) {
+                    Article.find().count({author: profile, 'comments.author': profile}, function(err, comments) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                          return res.json({
+                            'profile': {
+                              'username': userProfile[0].username,
+                              'role': userProfile[0].role,
+                              'email': userProfile[0].email,
+                              'createdAt': userProfile[0].createdAt,
+                              'bio': userProfile[0].bio
+                            },
+                            'articles': authorArticles,
+                            'comments': comments
+                          })
+                        }
+                    })
+                  } else {
+                    var err = new Error("Couldn't find that user");
+                    err.status = 404;
+                    return next(err);
+                  }
+
                 }
             })
 
