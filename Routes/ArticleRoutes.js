@@ -9,6 +9,7 @@ const roles = {
     'admin': { can: ['read', 'write'] },
 }
 
+
 //Get All Articles
 router.route('/').get(function(req, res) {
     Article.find(function(err, articles) {
@@ -128,18 +129,25 @@ router.route('/add').post(function(req, res) {
 router.route('/:slug/comments').post(function(req, res) {
     let slug = req.params.slug;
     console.log(slug)
-    Article.findOne({ slug: slug }, function (err, article) {
-        if (!article)
-            res.status(404).send("Article not found");
-        else
-            article.comments.push(req.body)
-            article.save().then(article => {
-                res.json('Comments added to ' + article.title);
-            })
-            .catch(err => {
-                res.status(400).send("Update not possible");
-            });
-    });
+    if (req.body.body) {
+      Article.findOne({ slug: slug }, function (err, article) {
+          if (!article)
+              res.status(404).send("Article not found");
+          else
+              article.comments.push(req.body)
+              article.save().then(article => {
+                  res.json('Comments added to ' + article.title);
+              })
+              .catch(err => {
+                  res.status(400).send("Update not possible");
+              });
+      });
+    } else {
+      var err = new Error('Body field required.');
+      err.status = 400;
+      return next(err);
+    }
+
 });
 
 module.exports = router;
